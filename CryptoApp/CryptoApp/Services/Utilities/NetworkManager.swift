@@ -10,10 +10,9 @@ import Combine
 
 protocol Networking {
     func request<T>(for url: URL) -> AnyPublisher<T, NetworkError> where T : Decodable
-    func completion(_ completion: Subscribers.Completion<NetworkError>)
 }
 
-struct NetworkManager: Networking {
+final class NetworkManager: Networking {
     private let session = URLSession.shared
     private let decoder: JSONDecoder = {
         let decoder = JSONDecoder()
@@ -23,24 +22,15 @@ struct NetworkManager: Networking {
     
     func request<T>(for url: URL) -> AnyPublisher<T, NetworkError> where T : Decodable {
         return session.dataTaskPublisher(for: url)
-            .tryMap { try handleUrlResponse(data: $0.data, response: $0.response) }
+            .tryMap { try self.handleUrlResponse(data: $0.data, response: $0.response) }
 //            .tryMap { (data, _) in
 //                let json = try JSONSerialization.jsonObject(with: data)
 //                print(json)
 //                return data
 //            }
             .decode(type: T.self, decoder: decoder)
-            .mapError { proccessError($0) }
+            .mapError { self.proccessError($0) }
             .eraseToAnyPublisher()
-    }
-    
-    func completion(_ completion: Subscribers.Completion<NetworkError>) {
-        switch completion {
-        case .finished:
-            print("Fetch data successfully finished")
-        case let .failure(error):
-            print(error.localizedDescription)
-        }
     }
     
     private func handleUrlResponse(data: Data, response: URLResponse) throws -> Data {

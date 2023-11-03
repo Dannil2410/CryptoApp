@@ -9,12 +9,12 @@ import Foundation
 import CoreData
 import Combine
 
-protocol PortfolioData {
+protocol PortfolioDataFetcher {
     var savedEntitiesPublisher: Published<[PortfolioEntity]>.Publisher { get }
     func updatePortfolio(coin: CoinModel, amount: Double)
 }
 
-final class PortfolioDataService: PortfolioData {
+final class PortfolioDataService: PortfolioDataFetcher {
     private let container: NSPersistentContainer
     private let containerName: String = "PortfolioContainer"
     private let entityName: String = "PortfolioEntity"

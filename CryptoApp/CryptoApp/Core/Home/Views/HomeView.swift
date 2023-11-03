@@ -13,6 +13,7 @@ struct HomeView: View {
     @State private var showPortfolio: Bool = false // animate right
     @State private var showPortfolioView: Bool = false // animate appear PortfolioView
     @StateObject private var vm: HomeViewModel
+    @EnvironmentObject private var vmFactory: ViewModelFactory
     
     init(vm: HomeViewModel) {
         self._vm = StateObject(wrappedValue: vm)
@@ -157,20 +158,30 @@ extension HomeView {
     private var allCoinsList: some View {
         List {
             ForEach(vm.allCoins) { coin in
-                CoinRowView(coin: coin, showHoldingsColumn: showPortfolio)
-                    .listRowInsets(.init(top: 10, leading: 0, bottom: 10, trailing: 10))
+                NavigationLink(value: coin) {
+                    CoinRowView(coin: coin, showHoldingsColumn: showPortfolio)
+                        .listRowInsets(.init(top: 10, leading: 0, bottom: 10, trailing: 10))
+                }
             }
         }
         .listStyle(.plain)
+        .navigationDestination(for: CoinModel.self) { coin in
+            DetailView(vm: vmFactory.makeDetailViewModel(forCoin: coin))
+        }
     }
     
     private var portfolioCoinsList: some View {
         List {
             ForEach(vm.portfolioCoins) { coin in
-                CoinRowView(coin: coin, showHoldingsColumn: showPortfolio)
-                    .listRowInsets(.init(top: 10, leading: 0, bottom: 10, trailing: 10))
+                NavigationLink(value: coin) {
+                    CoinRowView(coin: coin, showHoldingsColumn: showPortfolio)
+                        .listRowInsets(.init(top: 10, leading: 0, bottom: 10, trailing: 10))
+                }
             }
         }
         .listStyle(.plain)
+        .navigationDestination(for: CoinModel.self) { coin in
+            DetailView(vm: vmFactory.makeDetailViewModel(forCoin: coin))
+        }
     }
 }

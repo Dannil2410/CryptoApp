@@ -10,7 +10,6 @@ import SwiftUI
 @main
 struct CryptoAppApp: App {
     
-//    @StateObject private var viewModel: HomeViewModel = HomeViewModel()
     @StateObject private var viewModelFactory = ViewModelFactory()
     
     init() {

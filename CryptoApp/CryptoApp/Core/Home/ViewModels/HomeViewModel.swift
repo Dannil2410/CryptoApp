@@ -21,8 +21,8 @@ final class HomeViewModel: ObservableObject {
     
     private var cancellables = Set<AnyCancellable>()
     
-    private let dataFetcherService: DataFetcher
-    private let portfolioDataService: PortfolioData
+    private let dataFetcherService: HomeViewDataFetcher
+    private let portfolioDataService: PortfolioDataFetcher
     
     enum SortOption {
         case rank, rankReversed
@@ -30,7 +30,7 @@ final class HomeViewModel: ObservableObject {
         case price, priceReversed
     }
     
-    init(dataFetcherService: DataFetcher, portfolioDataService: PortfolioData) {
+    init(dataFetcherService: HomeViewDataFetcher, portfolioDataService: PortfolioDataFetcher) {
         self.dataFetcherService = dataFetcherService
         self.portfolioDataService = portfolioDataService
         self.dataFetcherService.getCoinsMarkets()
