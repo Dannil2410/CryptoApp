@@ -14,18 +14,17 @@ final class CoinImageViewModel: ObservableObject {
     @Published var isLoading: Bool = false
     private var cancellables = Set<AnyCancellable>()
     
-    private let coin: CoinModel
     private let coinImageService: ImageFetcherService
     
-    init(coin: CoinModel) {
-        self.coin = coin
-        self.coinImageService = ImageFetcherService(urlString: coin.image, imageName: coin.id)
+    init(coinImageFetcherService: ImageFetcherService, coin: CoinModel) {
+        self.coinImageService = coinImageFetcherService
+        self.coinImageService.getCoinImage(urlString: coin.image, imageName: coin.id)
         self.addSubsriber()
         self.isLoading = true
     }
     
     private func addSubsriber() {
-        coinImageService.$image
+        coinImageService.imagePublisher
             .sink(receiveCompletion: { [weak self] _ in
                 guard let self else { return }
                 self.isLoading = false

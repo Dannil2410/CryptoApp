@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		C83DBFC72AF42DA9003965D4 /* ViewModelFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = C83DBFC62AF42DA9003965D4 /* ViewModelFactory.swift */; };
 		C8E399162AF2EF3F00E94A5F /* CryptoAppApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8E399152AF2EF3F00E94A5F /* CryptoAppApp.swift */; };
 		C8E3991A2AF2EF4100E94A5F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C8E399192AF2EF4100E94A5F /* Assets.xcassets */; };
 		C8E3991D2AF2EF4100E94A5F /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C8E3991C2AF2EF4100E94A5F /* Preview Assets.xcassets */; };
@@ -41,6 +42,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		C83DBFC62AF42DA9003965D4 /* ViewModelFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewModelFactory.swift; sourceTree = "<group>"; };
 		C8E399122AF2EF3F00E94A5F /* CryptoApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CryptoApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		C8E399152AF2EF3F00E94A5F /* CryptoAppApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CryptoAppApp.swift; sourceTree = "<group>"; };
 		C8E399192AF2EF4100E94A5F /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -106,6 +108,7 @@
 			isa = PBXGroup;
 			children = (
 				C8E399152AF2EF3F00E94A5F /* CryptoAppApp.swift */,
+				C83DBFC62AF42DA9003965D4 /* ViewModelFactory.swift */,
 				C8E399282AF2F2C100E94A5F /* Extensions */,
 				C8E399372AF2F31700E94A5F /* Services */,
 				C8E399312AF2F31700E94A5F /* Models */,
@@ -151,9 +154,9 @@
 			children = (
 				C8E399382AF2F31700E94A5F /* PortfolioDataService.swift */,
 				C8E399392AF2F31700E94A5F /* DataFetcherService.swift */,
-				C8E3993A2AF2F31700E94A5F /* Utilities */,
 				C8E3993E2AF2F31700E94A5F /* ImageFetcherService.swift */,
 				C8E3993F2AF2F31700E94A5F /* NetworkError.swift */,
+				C8E3993A2AF2F31700E94A5F /* Utilities */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -171,8 +174,8 @@
 		C8E399402AF2F31800E94A5F /* Core */ = {
 			isa = PBXGroup;
 			children = (
-				C8E399412AF2F31800E94A5F /* Home */,
 				C8E399492AF2F31800E94A5F /* Components */,
+				C8E399412AF2F31800E94A5F /* Home */,
 			);
 			path = Core;
 			sourceTree = "<group>";
@@ -349,6 +352,7 @@
 				C8E399702AF2F38C00E94A5F /* StatisticView.swift in Sources */,
 				C8E3996F2AF2F38900E94A5F /* CoinImageView.swift in Sources */,
 				C8E3996E2AF2F38600E94A5F /* CoinLogoView.swift in Sources */,
+				C83DBFC72AF42DA9003965D4 /* ViewModelFactory.swift in Sources */,
 				C8E3996D2AF2F38200E94A5F /* CoinImageViewModel.swift in Sources */,
 				C8E3996C2AF2F37F00E94A5F /* XmarkButton.swift in Sources */,
 				C8E3996B2AF2F37C00E94A5F /* CircleButtonAnimationView.swift in Sources */,

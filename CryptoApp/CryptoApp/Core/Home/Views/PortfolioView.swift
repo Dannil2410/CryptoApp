@@ -10,10 +10,14 @@ import SwiftUI
 struct PortfolioView: View {
     
     @Environment(\.dismiss) var dismiss
-    @EnvironmentObject private var vm: HomeViewModel
+    @StateObject private var vm: HomeViewModel
     @State private var selectedCoin: CoinModel? = nil
     @State private var quantityText: String = ""
     @State private var showCheckMark: Bool = false
+    
+    init(vm: HomeViewModel) {
+        self._vm = StateObject(wrappedValue: vm)
+    }
     
     var body: some View {
         NavigationStack {
@@ -49,8 +53,8 @@ struct PortfolioView: View {
 
 struct PortfolioView_Previews: PreviewProvider {
     static var previews: some View {
-        PortfolioView()
-            .environmentObject(dev.homeVM)
+        PortfolioView(vm: ViewModelFactory().makeHomeViewModel())
+            .environmentObject(dev.viewModelFactory)
     }
 }
 
@@ -84,7 +88,7 @@ extension PortfolioView {
             HStack {
                 Text("Current price of \(selectedCoin?.symbol.uppercased() ?? ""):")
                 Spacer()
-                Text(selectedCoin?.currentPrice.asCurrencyWith6Decimals() ?? "")
+                Text(selectedCoin?.coinCurrentPrice.asCurrencyWith6Decimals() ?? "")
             }
             Divider()
             HStack {
@@ -162,10 +166,8 @@ extension PortfolioView {
         UIApplication.shared.endEditing()
         
         // hide checkmark
-        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-            withAnimation(.easeOut) {
-                showCheckMark = false
-            }
+        withAnimation(.easeOut.delay(2)) {
+            showCheckMark = false
         }
     }
     

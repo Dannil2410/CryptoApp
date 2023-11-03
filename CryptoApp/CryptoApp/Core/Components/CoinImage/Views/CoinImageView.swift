@@ -9,10 +9,10 @@ import SwiftUI
 
 struct CoinImageView: View {
     
-    @StateObject var vm: CoinImageViewModel
+    @StateObject private var vm: CoinImageViewModel
     
-    init(coin: CoinModel) {
-        self._vm = StateObject(wrappedValue: CoinImageViewModel(coin: coin))
+    init(vm: CoinImageViewModel) {
+        self._vm = StateObject(wrappedValue: vm)
     }
     
     var body: some View {
@@ -33,7 +33,7 @@ struct CoinImageView: View {
 
 struct CoinImageView_Previews: PreviewProvider {
     static var previews: some View {
-        CoinImageView(coin: dev.coin)
+        CoinImageView(vm: ViewModelFactory().makeCoinImageViewModel(forCoin: dev.coin) )
             .padding()
             .previewLayout(.sizeThatFits)
     }

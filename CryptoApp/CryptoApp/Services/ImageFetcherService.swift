@@ -9,21 +9,28 @@ import Foundation
 import Combine
 import SwiftUI
 
-final class ImageFetcherService {
-    
-    @Published var image: UIImage? = nil
+protocol ImageFetcher {
+    var imagePublisher: Published<UIImage?>.Publisher { get }
+    func getCoinImage(urlString: String, imageName: String)
+}
+
+final class ImageFetcherService: ImageFetcher {
+    @Published private var image: UIImage? = nil
     private var coinImageSubscription: AnyCancellable?
     private let session = URLSession.shared
-    private let fileManager = LocalFileManager.shared
+    private let fileManager: LocalFileManagerProtocol
     private let coinImagesFolderName = "coinImages"
     
-    init(urlString: String, imageName: String) {
-        
-        getCoinImage(urlString: urlString, imageName: imageName)
+    var imagePublisher: Published<UIImage?>.Publisher {
+        $image
     }
     
-    private func getCoinImage(urlString: String, imageName: String) {
-        if let image = LocalFileManager.shared.getImage(name: imageName, folderName: coinImagesFolderName) {
+    init(fileManager: LocalFileManagerProtocol) {
+        self.fileManager = fileManager
+    }
+    
+    func getCoinImage(urlString: String, imageName: String) {
+        if let image = fileManager.getImage(name: imageName, folderName: coinImagesFolderName) {
             self.image = image
             return
         }

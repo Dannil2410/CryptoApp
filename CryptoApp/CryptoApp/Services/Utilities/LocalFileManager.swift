@@ -8,11 +8,12 @@
 import Foundation
 import SwiftUI
 
-final class LocalFileManager {
-    static let shared = LocalFileManager()
-    
-    private init() {}
-    
+protocol LocalFileManagerProtocol {
+    func saveImage(_ image: UIImage, imageName: String, folderName: String)
+    func getImage(name: String, folderName: String) -> UIImage?
+}
+
+final class LocalFileManager: LocalFileManagerProtocol {
     func saveImage(_ image: UIImage, imageName: String, folderName: String) {
         
         // create folder

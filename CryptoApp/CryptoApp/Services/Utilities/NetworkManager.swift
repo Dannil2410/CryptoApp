@@ -8,28 +8,42 @@
 import Foundation
 import Combine
 
-struct NetworkManager {
-    private static let session = URLSession.shared
-    private static let decoder: JSONDecoder = {
+protocol Networking {
+    func request<T>(for url: URL) -> AnyPublisher<T, NetworkError> where T : Decodable
+    func completion(_ completion: Subscribers.Completion<NetworkError>)
+}
+
+struct NetworkManager: Networking {
+    private let session = URLSession.shared
+    private let decoder: JSONDecoder = {
         let decoder = JSONDecoder()
         decoder.keyDecodingStrategy = .convertFromSnakeCase
         return decoder
     }()
     
-    static func request<T>(for url: URL) -> AnyPublisher<T, Error> where T : Decodable {
-        return NetworkManager.session.dataTaskPublisher(for: url)
-            .tryMap { try NetworkManager.handleUrlResponse(data: $0.data, response: $0.response) }
+    func request<T>(for url: URL) -> AnyPublisher<T, NetworkError> where T : Decodable {
+        return session.dataTaskPublisher(for: url)
+            .tryMap { try handleUrlResponse(data: $0.data, response: $0.response) }
 //            .tryMap { (data, _) in
 //                let json = try JSONSerialization.jsonObject(with: data)
 //                print(json)
 //                return data
 //            }
-            .decode(type: T.self, decoder: NetworkManager.decoder)
-            .mapError { NetworkManager.proccessError($0) }
+            .decode(type: T.self, decoder: decoder)
+            .mapError { proccessError($0) }
             .eraseToAnyPublisher()
     }
     
-    static func handleUrlResponse(data: Data, response: URLResponse) throws -> Data {
+    func completion(_ completion: Subscribers.Completion<NetworkError>) {
+        switch completion {
+        case .finished:
+            print("Fetch data successfully finished")
+        case let .failure(error):
+            print(error.localizedDescription)
+        }
+    }
+    
+    private func handleUrlResponse(data: Data, response: URLResponse) throws -> Data {
         if let response = response as? HTTPURLResponse {
             guard (200...299).contains(response.statusCode) else {
                 throw NetworkError.invalidResponseCode(response.statusCode)
@@ -38,19 +52,10 @@ struct NetworkManager {
         return data
     }
     
-    static func proccessError(_ error: Error) -> NetworkError {
+    private func proccessError(_ error: Error) -> NetworkError {
         if let _ = error as? DecodingError {
             return NetworkError.decodingError
         }
         return NetworkError.genericError(error.localizedDescription)
-    }
-    
-    static func completion(_ completion: Subscribers.Completion<Error>) {
-        switch completion {
-        case .finished:
-            print("Fetch data successfully finished")
-        case let .failure(error):
-            print(error.localizedDescription)
-        }
     }
 }

@@ -9,29 +9,46 @@ import Foundation
 import Combine
 import SwiftUI
 
-final class DataFetcherService {
+protocol DataFetcher {
+    var allCoinsPublisher: AnyPublisher<[CoinModel], Never> { get }
+    var globalDataPublisher: AnyPublisher<GlobalData, Never> { get }
+    func getCoinsMarkets()
+    func getGlobalData()
+}
+
+final class DataFetcherService: DataFetcher {
     
-    @Published var allCoins: [CoinModel] = []
-    @Published var globalData: GlobalData = GlobalData.blankObject
+    private var allCoinsSubject = PassthroughSubject<[CoinModel], Never>()
+    private var globalDataSubject = PassthroughSubject<GlobalData, Never>()
     private var coinSubscription: AnyCancellable?
     private var globalDataSubscription: AnyCancellable?
+    private let networkService: Networking
     
-    init() {
-        getCoinsMarkets()
-        getGlobalData()
+    var allCoinsPublisher: AnyPublisher<[CoinModel], Never> {
+        allCoinsSubject
+            .eraseToAnyPublisher()
+    }
+    
+    var globalDataPublisher: AnyPublisher<GlobalData, Never> {
+        globalDataSubject
+            .eraseToAnyPublisher()
+    }
+    
+    init(networkService: Networking) {
+        self.networkService = networkService
     }
     
     func getCoinsMarkets() {
         coinSubscription?.cancel()
         guard let url = CoinGeckoAPI.getCoinsMarketsURL() else { return }
         
-        coinSubscription = NetworkManager.request(for: url)
+        coinSubscription = networkService.request(for: url)
             .receive(on: DispatchQueue.main)
             .sink(
-                receiveCompletion: NetworkManager.completion,
+                receiveCompletion: networkService.completion,
                 receiveValue: { [weak self] returnedCoins in
                     guard let self else { return }
-                    self.allCoins = returnedCoins
+                    self.allCoinsSubject.send(returnedCoins)
                 })
     }
     
@@ -39,13 +56,13 @@ final class DataFetcherService {
         globalDataSubscription?.cancel()
         guard let url = CoinGeckoAPI.getGlobalDataURL() else { return }
         
-        globalDataSubscription = NetworkManager.request(for: url)
+        globalDataSubscription = networkService.request(for: url)
             .receive(on: DispatchQueue.main)
             .sink(
-                receiveCompletion: NetworkManager.completion,
+                receiveCompletion: networkService.completion,
                 receiveValue: { [weak self] returnedGlobalData in
                     guard let self else { return }
-                    self.globalData = returnedGlobalData
+                    globalDataSubject.send(returnedGlobalData)
                 })
     }
 }
@@ -72,7 +89,7 @@ extension DataFetcherService {
                 URLQueryItem(name: "sparkline", value: "true"),
                 URLQueryItem(name: "price_change_percentage", value: "24h"),
                 URLQueryItem(name: "locale", value: "en"),
-                URLQueryItem(name: "x_cg_demo_api_key", value: "CG-bUv9QaFg7gjkGBtudAAiv57G")
+                URLQueryItem(name: "x_cg_demo_api_key", value: "CG-Z9xuwgM5gF6dtxrskoqqvRdi")
             ]
             
             components.queryItems = queryItems

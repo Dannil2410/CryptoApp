@@ -10,7 +10,7 @@ import SwiftUI
 struct HomeStatisticView: View {
     
     @Binding var showPortfolio: Bool
-    @EnvironmentObject private var vm: HomeViewModel
+    @ObservedObject var vm: HomeViewModel
     
     var body: some View {
         HStack {
@@ -28,7 +28,6 @@ struct HomeStatisticView: View {
 
 struct HomeStatisticView_Previews: PreviewProvider {
     static var previews: some View {
-        HomeStatisticView(showPortfolio: .constant(true))
-            .environmentObject(dev.homeVM)
+        HomeStatisticView(showPortfolio: .constant(false), vm: ViewModelFactory().makeHomeViewModel())
     }
 }

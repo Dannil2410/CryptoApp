@@ -23,7 +23,9 @@ final class DeveloperPreview {
     
     private init() {}
     
-    let homeVM = HomeViewModel()
+    let viewModelFactory = ViewModelFactory()
+    
+    let homeVM = HomeViewModel(dataFetcherService: DataFetcherService(networkService: NetworkManager()), portfolioDataService: PortfolioDataService())
     
     let stat1 = StatisticModel(title: "Market Cup", value: "$2.56Tr", percentageChange: 0.06)
     let stat2 = StatisticModel(title: "Total Volume", value: "$1.23Tr")

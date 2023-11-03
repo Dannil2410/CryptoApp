@@ -9,11 +9,12 @@ import SwiftUI
 
 struct CoinLogoView: View {
     
+    @EnvironmentObject private var vmFactory: ViewModelFactory
     let coin: CoinModel
     
     var body: some View {
         VStack {
-            CoinImageView(coin: coin)
+            CoinImageView(vm: vmFactory.makeCoinImageViewModel(forCoin: coin))
                 .frame(width: 50, height: 50)
             Text(coin.symbol.uppercased())
                 .font(.headline)
@@ -41,5 +42,6 @@ struct CoinLogoView_Previews: PreviewProvider {
                 .previewLayout(.sizeThatFits)
                 .preferredColorScheme(.dark)
         }
+        .environmentObject(dev.viewModelFactory)
     }
 }

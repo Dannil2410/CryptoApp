@@ -10,7 +10,8 @@ import SwiftUI
 @main
 struct CryptoAppApp: App {
     
-    @StateObject private var viewModel: HomeViewModel = HomeViewModel()
+//    @StateObject private var viewModel: HomeViewModel = HomeViewModel()
+    @StateObject private var viewModelFactory = ViewModelFactory()
     
     init() {
         UINavigationBar.appearance().largeTitleTextAttributes = [.foregroundColor: UIColor(Color.theme.tint)]
@@ -20,9 +21,9 @@ struct CryptoAppApp: App {
     var body: some Scene {
         WindowGroup {
             NavigationStack {
-                HomeView()
+                HomeView(vm: viewModelFactory.makeHomeViewModel())
                     .toolbar(.hidden)
-            }.environmentObject(viewModel)
+            }.environmentObject(viewModelFactory)
         }
     }
 }

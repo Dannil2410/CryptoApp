@@ -9,14 +9,22 @@ import Foundation
 import CoreData
 import Combine
 
-final class PortfolioDataService {
-    
+protocol PortfolioData {
+    var savedEntitiesPublisher: Published<[PortfolioEntity]>.Publisher { get }
+    func updatePortfolio(coin: CoinModel, amount: Double)
+}
+
+final class PortfolioDataService: PortfolioData {
     private let container: NSPersistentContainer
     private let containerName: String = "PortfolioContainer"
     private let entityName: String = "PortfolioEntity"
     
-    @Published var savedEntities: [PortfolioEntity] = []
+    @Published private var savedEntities: [PortfolioEntity] = []
     
+    var savedEntitiesPublisher: Published<[PortfolioEntity]>.Publisher {
+        $savedEntities
+    }
+
     init() {
         container = NSPersistentContainer(name: containerName)
         container.loadPersistentStores { [weak self] (_, error) in
@@ -53,7 +61,7 @@ final class PortfolioDataService {
         let request = NSFetchRequest<PortfolioEntity>(entityName: entityName)
         
         do {
-            savedEntities  = try container.viewContext.fetch(request)
+            savedEntities = try container.viewContext.fetch(request)
         } catch let error {
             print("Error fetching PortfolioEntity. \(error)")
         }
@@ -64,17 +72,17 @@ final class PortfolioDataService {
         entity.coinID = coin.id
         entity.amount = amount
         
-        applyCnahges()
+        applyChanges()
     }
     
     private func update(entity: PortfolioEntity, amount: Double) {
         entity.amount = amount
-        applyCnahges()
+        applyChanges()
     }
     
     private func delete(entity: PortfolioEntity) {
         container.viewContext.delete(entity)
-        applyCnahges()
+        applyChanges()
     }
     
     private func save() {
@@ -85,7 +93,7 @@ final class PortfolioDataService {
         }
     }
     
-    private func applyCnahges() {
+    private func applyChanges() {
         save()
         getPortfolio()
     }

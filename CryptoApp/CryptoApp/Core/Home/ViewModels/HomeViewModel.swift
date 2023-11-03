@@ -16,11 +16,13 @@ final class HomeViewModel: ObservableObject {
     @Published var searchBarText: String = ""
     @Published var isLoading: Bool = false
     @Published var sortOption: SortOption = .holdings
+    @Published private var globalData: GlobalData = GlobalData.blankObject
+    @Published private var savedEntities: [PortfolioEntity] = []
     
     private var cancellables = Set<AnyCancellable>()
     
-    private let dataFetcherService = DataFetcherService()
-    private let portfolioDataService = PortfolioDataService()
+    private let dataFetcherService: DataFetcher
+    private let portfolioDataService: PortfolioData
     
     enum SortOption {
         case rank, rankReversed
@@ -28,8 +30,12 @@ final class HomeViewModel: ObservableObject {
         case price, priceReversed
     }
     
-    init() {
-        addSubscribers()
+    init(dataFetcherService: DataFetcher, portfolioDataService: PortfolioData) {
+        self.dataFetcherService = dataFetcherService
+        self.portfolioDataService = portfolioDataService
+        self.dataFetcherService.getCoinsMarkets()
+        self.dataFetcherService.getGlobalData()
+        self.addSubscribers()
     }
     
     //MARK: - Public functions
@@ -45,11 +51,12 @@ final class HomeViewModel: ObservableObject {
     }
     
     //MARK: - Private functions
+    
     private func addSubscribers() {
         
         //Updates allCoins
         $searchBarText
-            .combineLatest(dataFetcherService.$allCoins, $sortOption)
+            .combineLatest(dataFetcherService.allCoinsPublisher, $sortOption)
             .debounce(for: 0.5, scheduler: DispatchQueue.main)
             .map(filterAndSortCoins)
             .sink { [weak self] returnedCoins in
@@ -60,7 +67,7 @@ final class HomeViewModel: ObservableObject {
         
         //Updates portfolioCoins
         $allCoins
-            .combineLatest(portfolioDataService.$savedEntities)
+            .combineLatest(portfolioDataService.savedEntitiesPublisher)
             .map(convertPortfolioEntityToCoinModel)
             .sink { [weak self] returnedPortfolioCoins in
                 guard let self else { return }
@@ -69,7 +76,7 @@ final class HomeViewModel: ObservableObject {
             .store(in: &cancellables)
         
         //Updates stats
-        dataFetcherService.$globalData
+        dataFetcherService.globalDataPublisher
             .combineLatest($portfolioCoins)
             .map(convertMarketDataToStatisticModel)
             .sink { [weak self] statistics in
@@ -105,9 +112,9 @@ final class HomeViewModel: ObservableObject {
         case .rankReversed, .holdingsReversed:
             coins.sort { $0.rank > $1.rank }
         case .price:
-            coins.sort { $0.currentPrice > $1.currentPrice }
+            coins.sort { $0.coinCurrentPrice > $1.coinCurrentPrice }
         case .priceReversed:
-            coins.sort { $0.currentPrice < $1.currentPrice }
+            coins.sort { $0.coinCurrentPrice < $1.coinCurrentPrice }
         }
     }
     
@@ -124,7 +131,7 @@ final class HomeViewModel: ObservableObject {
     }
     
     private func convertMarketDataToStatisticModel(globalData: GlobalData, portfolioCoins: [CoinModel]) -> [StatisticModel] {
-        guard let marketData = globalData.data else { return []}
+        guard let marketData = globalData.data else { return [] }
         
         let marketCap = StatisticModel(title: "Market Cap", value: marketData.marketCap, percentageChange: marketData.marketCapChangePercentage24HUsd)
         
@@ -138,6 +145,13 @@ final class HomeViewModel: ObservableObject {
     }
     
     private func updatePortfolioStatistic(portfolioCoins: [CoinModel]) -> StatisticModel {
+        guard !portfolioCoins.isEmpty else {
+            return StatisticModel(
+                title: "Portfolio Value",
+                value: 0.asCurrencyWith2Decimals(),
+                percentageChange: 0
+            )
+        }
         let portfolioValue = portfolioCoins
             .map { $0.currentHoldingsValue }
             .reduce(0, +)

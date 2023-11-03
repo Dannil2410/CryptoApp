@@ -12,7 +12,11 @@ struct HomeView: View {
     
     @State private var showPortfolio: Bool = false // animate right
     @State private var showPortfolioView: Bool = false // animate appear PortfolioView
-    @EnvironmentObject private var vm: HomeViewModel
+    @StateObject private var vm: HomeViewModel
+    
+    init(vm: HomeViewModel) {
+        self._vm = StateObject(wrappedValue: vm)
+    }
     
     var body: some View {
         ZStack {
@@ -20,15 +24,14 @@ struct HomeView: View {
             Color.theme.background
                 .ignoresSafeArea()
                 .sheet(isPresented: $showPortfolioView) {
-                    PortfolioView()
-                        .environmentObject(vm)
+                    PortfolioView(vm: vm)
                 }
             
             // content layer
             VStack {
                 homeHeader
                 
-                HomeStatisticView(showPortfolio: $showPortfolio)
+                HomeStatisticView(showPortfolio: $showPortfolio, vm: vm)
                 
                 SearchBarView(searchText: $vm.searchBarText)
                 
@@ -51,9 +54,9 @@ struct HomeView: View {
 struct HomeView_Previews: PreviewProvider {
     static var previews: some View {
         NavigationStack {
-            HomeView()
+            HomeView(vm: ViewModelFactory().makeHomeViewModel())
         }
-        .environmentObject(dev.homeVM)
+        .environmentObject(dev.viewModelFactory)
     }
 }
 
@@ -159,9 +162,6 @@ extension HomeView {
             }
         }
         .listStyle(.plain)
-        .refreshable {
-            print("kek")
-        }
     }
     
     private var portfolioCoinsList: some View {

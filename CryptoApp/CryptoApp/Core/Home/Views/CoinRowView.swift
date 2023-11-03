@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct CoinRowView: View {
+    @EnvironmentObject private var vmFactory: ViewModelFactory
     
     let coin: CoinModel
     let showHoldingsColumn: Bool
@@ -38,6 +39,7 @@ struct CoinRowView_Previews: PreviewProvider {
                 .previewLayout(.sizeThatFits)
                 .preferredColorScheme(.dark)
         }
+        .environmentObject(dev.viewModelFactory)
         
     }
 }
@@ -50,7 +52,7 @@ extension CoinRowView {
                 .foregroundColor(Color.theme.secondaryText)
                 .frame(minWidth: 30)
             
-            CoinImageView(coin: coin)
+            CoinImageView(vm: vmFactory.makeCoinImageViewModel(forCoin: coin))
                 .frame(width: 30, height: 30)
             
             Text(coin.symbol.uppercased())
@@ -74,7 +76,7 @@ extension CoinRowView {
     
     private var rightColumn: some View {
         VStack(alignment: .trailing) {
-            Text(coin.currentPrice
+            Text(coin.coinCurrentPrice
                 .asCurrencyWith6Decimals()
             )
             .fontWeight(.bold)
