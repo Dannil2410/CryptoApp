@@ -42,7 +42,6 @@ final class HomeViewDataFetcherService: HomeViewDataFetcher {
         guard let url = CoinGeckoAPI.getCoinsMarketsURL() else { return }
         
         coinSubscription = networkManager.request(for: url)
-            .receive(on: DispatchQueue.main)
             .sink(
                 receiveCompletion: completion,
                 receiveValue: { [weak self] returnedCoins in
@@ -56,7 +55,6 @@ final class HomeViewDataFetcherService: HomeViewDataFetcher {
         guard let url = CoinGeckoAPI.getGlobalDataURL() else { return }
         
         globalDataSubscription = networkManager.request(for: url)
-            .receive(on: DispatchQueue.main)
             .sink(
                 receiveCompletion: completion,
                 receiveValue: { [weak self] returnedGlobalData in

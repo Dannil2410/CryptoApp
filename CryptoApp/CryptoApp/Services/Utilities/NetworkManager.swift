@@ -28,7 +28,9 @@ final class NetworkManager: Networking {
 //                print(json)
 //                return data
 //            }
+            .retry(3)
             .decode(type: T.self, decoder: decoder)
+            .receive(on: DispatchQueue.main)
             .mapError { self.proccessError($0) }
             .eraseToAnyPublisher()
     }

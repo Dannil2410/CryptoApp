@@ -34,7 +34,6 @@ final class DetailViewDataFetcherService: DetailViewDataFetcher {
         guard let url = CoinGeckoAPI.getCoinDetailsURL(forCoinId: coinId) else { return }
         
         coinDetailsSubscription = networkManager.request(for: url)
-            .receive(on: DispatchQueue.main)
             .sink(
                 receiveCompletion: completion,
                 receiveValue: { [weak self] returnedCoinDetailData in

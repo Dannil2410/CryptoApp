@@ -61,6 +61,10 @@ struct DetailView: View {
                 navigationBarTrailingItems
             }
         }
+        .background(
+            Color.theme.background
+                .ignoresSafeArea()
+        )
         
     }
 }
@@ -96,7 +100,7 @@ extension DetailView {
     }
     
     private var descriptionSection: some View {
-        ZStack {
+        VStack {
             if let description = vm.coinDescription,
                 !description.isEmpty {
                 VStack(alignment: .leading) {
@@ -106,15 +110,14 @@ extension DetailView {
                         .foregroundColor(Color.theme.secondaryText)
                     
                     Button {
-                        withAnimation(.default) {
-                            showFullDescription.toggle()
-                        }
+                        showFullDescription.toggle()
                     } label: {
                         Text(showFullDescription ? "Less": "Read more...")
                             .font(.headline)
                             .bold()
                             .foregroundColor(Color.blue)
                             .padding(.vertical, 1)
+                            .animation(.easeInOut, value: showFullDescription)
                     }
 
                 }

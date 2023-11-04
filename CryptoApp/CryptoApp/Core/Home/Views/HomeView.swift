@@ -12,6 +12,7 @@ struct HomeView: View {
     
     @State private var showPortfolio: Bool = false // animate right
     @State private var showPortfolioView: Bool = false // animate appear PortfolioView
+    @State private var showSettingsView: Bool = false // animate appear SettingsView
     @StateObject private var vm: HomeViewModel
     @EnvironmentObject private var vmFactory: ViewModelFactory
     
@@ -42,11 +43,20 @@ struct HomeView: View {
                     allCoinsList
                         .transition(.move(edge: .leading))
                 } else {
-                    portfolioCoinsList
-                        .transition(.move(edge: .trailing))
+                    ZStack(alignment: .top) {
+                        if vm.portfolioCoins.isEmpty && vm.searchBarText.isEmpty {
+                            portfolioEmtyText
+                        } else {
+                            portfolioCoinsList
+                        }
+                    }
+                    .transition(.move(edge: .trailing))
                 }
                                     
                 Spacer(minLength: 0)
+            }
+            .sheet(isPresented: $showSettingsView) {
+                SettingsView()
             }
         }
     }
@@ -70,6 +80,8 @@ extension HomeView {
                     if showPortfolio {
                         showPortfolioView.toggle()
                         vm.searchBarText = ""
+                    } else {
+                        showSettingsView.toggle()
                     }
                 }
                 .background(
@@ -163,6 +175,7 @@ extension HomeView {
                         .listRowInsets(.init(top: 10, leading: 0, bottom: 10, trailing: 10))
                 }
             }
+            .listRowBackground(Color.clear)
         }
         .listStyle(.plain)
         .navigationDestination(for: CoinModel.self) { coin in
@@ -178,10 +191,20 @@ extension HomeView {
                         .listRowInsets(.init(top: 10, leading: 0, bottom: 10, trailing: 10))
                 }
             }
+            .listRowBackground(Color.clear)
         }
         .listStyle(.plain)
         .navigationDestination(for: CoinModel.self) { coin in
             DetailView(vm: vmFactory.makeDetailViewModel(forCoin: coin))
         }
+    }
+    
+    private var portfolioEmtyText: some View {
+        Text("You haven't added any coins to your portfolio yet. Click the + Button to get started! 🧐")
+            .font(.callout)
+            .fontWeight(.medium)
+            .foregroundColor(Color.theme.tint)
+            .multilineTextAlignment(.center)
+            .padding(50)
     }
 }
